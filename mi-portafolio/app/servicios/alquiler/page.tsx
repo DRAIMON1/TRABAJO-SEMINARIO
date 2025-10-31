@@ -40,7 +40,7 @@ export default function AlquilerPage() {
               className="w-full h-auto object-cover" 
             />
             
-            <h3 className="text-2xl font-semibold p-4">Taladros y Rotomartillos</h3>
+            <h3 className="text-2xl font-semibold p-4 text-green-700">Taladros y Rotomartillos</h3>
           </div>
 
   {/* Puedes añadir una segunda tarjeta... */}
@@ -61,7 +61,7 @@ export default function AlquilerPage() {
       (Imagen de Sierra)
     </div>
 
-    <h3 className="text-2xl font-semibold p-4">Sierras Circulares</h3>
+    <h3 className="text-2xl font-semibold p-4 text-blue-700">Sierras Circulares</h3>
   </div>
 
   {/* Y una tercera... */}
@@ -69,7 +69,7 @@ export default function AlquilerPage() {
     <div className="w-full h-[250px] bg-gray-200 flex items-center justify-center text-gray-500">
       (Imagen de Llaves)
     </div>
-    <h3 className="text-2xl font-semibold p-4">Juegos de Llaves</h3>
+    <h3 className="text-2xl font-semibold p-4 text-blue-700">Juegos de Llaves </h3>
   </div>
   
           
@@ -102,7 +102,7 @@ export default function AlquilerPage() {
       className="w-full h-auto object-cover" 
     />
     
-    <h3 className="text-2xl font-semibold p-4">Andamios Plegables</h3>
+    <h3 className="text-2xl font-semibold p-4 text-blue-700">Andamios Plegables</h3>
   </div>
 
   {/* Puedes añadir una segunda tarjeta... */}
@@ -132,7 +132,7 @@ export default function AlquilerPage() {
     /> 
     {/* Mientras no tienes la imagen, puedes usar el placeholder: */}
     
-    <h3 className="text-2xl font-semibold p-4">Atornillador de impacto</h3>
+    <h3 className="text-2xl font-semibold p-4 text-blue-700">Atornillador de impacto</h3>
   </div>
 
   {/* Y una tercera... */}
@@ -158,7 +158,7 @@ export default function AlquilerPage() {
       className="w-full h-auto object-cover" 
     /> 
     
-    <h3 className="text-2xl font-semibold p-4">Atornillador para drywall</h3>
+    <h3 className="text-2xl font-semibold p-4 text-blue-700">Atornillador para drywall</h3>
   </div>
     </div>
         </div>

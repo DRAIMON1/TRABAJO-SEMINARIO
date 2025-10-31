@@ -1,39 +1,53 @@
 import Link from "next/link";
+import Image from "next/image";
 import AnimatedSection from '@/components/AnimatedSection';
 export default function Home() {
   return (
-    // Usamos <main> como el contenedor general
-    <main className="flex-col"> {/* Quitamos centrado y padding por defecto */}
+    <main className="flex-col">
 
-      {/* --- SECCIÓN 1: HERO VISUAL (Inspirado en Arkhe) --- */}
-      {/* Este div ocupa toda la altura de la pantalla (min-h-screen).
-        Usaremos un color oscuro de fondo por ahora. 
-        ¡Más adelante reemplazaremos esto con una imagen de fondo!
-      */}
-      <section className="min-h-screen w-full bg-gray-900 flex flex-col justify-center items-center text-white p-8 pt-20">
+      {/* --- SECCIÓN 1: HERO VISUAL (CON IMAGEN DE FONDO) --- */}
+      
+      {/* 1. Contenedor principal 'relative' para posicionar la imagen */}
+      <section className="relative min-h-screen w-full flex flex-col justify-center items-center text-white p-8 pt-20">
         
-        {/* Contenido del Hero */}
-        <div className="text-center">
-          <h1 className="text-6xl font-extrabold mb-4">
+        {/* 2. IMAGEN DE FONDO */}
+        {/* Ocupa todo el 'section', está en el fondo (z-0) */}
+        <Image
+          src="/hero-background.jpg" // ⬅️ ¡Asegúrate de tener esta imagen en 'public'!
+          alt="Fondo de Construtech ISL"
+          layout="fill" // 'fill' hace que llene el contenedor
+          objectFit="cover" // 'cover' recorta la imagen para que llene el espacio sin deformarse
+          className="z-0"
+          priority // 'priority' le dice a Next.js que cargue esta imagen primero
+        />
+        
+        {/* 3. CAPA OSCURA (Para que el texto se lea bien) */}
+        {/* Se pone encima de la imagen (z-10) pero debajo del texto (z-20) */}
+        <div className="absolute inset-0 bg-black/50 z-10"></div>
+
+        {/* 4. Contenido del Hero (Tu texto y botón) */}
+        {/* 'z-20' lo pone encima de todo */}
+        <div className="relative z-20 text-center flex flex-col items-center">
+          
+          {/* 5. TEXTO RESPONSIVO */}
+          <h1 className="text-5xl md:text-7xl font-extrabold mb-4">
             CONSTRUTECH ISL
           </h1>
-          <p className="text-2xl text-gray-300 max-w-3xl">
+          <p className="text-xl md:text-2xl text-gray-200 max-w-3xl">
             La Esencia de tu Proyecto: Herramientas, Capacitación y Expertos.
           </p>
-          <p> ----------
-
-          </p>
           
-          {/* --- 3. CAMBIO DE BOTÓN A LINK --- */}
+          {/* 6. BOTÓN RESPONSIVO */}
           <Link 
-            href="/quienes-somos" // Enlaza a la nueva página
-            className="mt-20 px-40 py-2 bg-blue-600 text-white font-bold rounded-lg text-lg hover:bg-blue-700 transition-colors"
+            href="/quienes-somos"
+            className="mt-12 md:mt-16 px-12 py-3 md:px-20 
+                       bg-blue-600 text-white font-bold rounded-lg 
+                       text-lg hover:bg-blue-700 transition-all duration-300"
           >
-            Conócenos {/* Texto cambiado */}
+            Conócenos
           </Link>
         </div>
       </section>
-
       {/* --- SECCIÓN 2: SERVICIOS DESTACADOS (Inspirado en Arkhe) --- */}
       {/* Esta sección tiene un fondo gris claro para contrastar 
         con la sección Hero oscura.
@@ -118,6 +132,7 @@ export default function Home() {
 {/* Aquí usaremos un fondo oscuro. 
   Más adelante, te enseñaré a cambiar 'bg-gray-900' por una imagen de fondo.
 */}
+<AnimatedSection>
 <section className="w-full bg-gray-900 py-24 px-8 text-white text-center">
   <h2 className="text-4xl font-bold mb-6 max-w-3xl mx-auto">
     ¿Listo para llevar tu proyecto al siguiente nivel?
@@ -132,7 +147,7 @@ export default function Home() {
     Contáctanos
   </Link>
 </section>
-
+</AnimatedSection>
     </main>
   );
 }
