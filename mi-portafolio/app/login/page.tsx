@@ -1,13 +1,14 @@
 "use client"; // Esta página es interactiva
 
 import { useState } from 'react';
-// Este 'createClient' se creó con el asistente del Paso 2
 import { createClient } from '@/utils/supabase/client';
+// 1. YA NO NECESITAMOS 'useRouter'. Lo hemos borrado.
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const supabase = createClient();
+  // 2. YA NO NECESITAMOS 'const router = useRouter()'
 
   const handleSignUp = async () => {
     try {
@@ -16,7 +17,13 @@ export default function LoginPage() {
         password,
       });
       if (error) throw error;
-      alert('¡Revisa tu email para confirmar el registro!');
+      alert('¡Registro exitoso! Por favor, revisa tu email para confirmar.');
+
+      // 3. LA SOLUCIÓN: Forzamos una recarga completa
+      // Esto pide una página NUEVA al servidor,
+      // el cual verá la cookie y renderizará el Navbar "Perfil".
+      window.location.href = '/servicios/alquiler';
+
     } catch (error: any) {
       alert(error.message);
     }
@@ -29,8 +36,10 @@ export default function LoginPage() {
         password,
       });
       if (error) throw error;
-      alert('¡Inicio de sesión exitoso!');
-      // Aquí, Next.js debería redirigir automáticamente
+
+      // 4. LA SOLUCIÓN: Forzamos una recarga completa
+      window.location.href = '/servicios/alquiler';
+
     } catch (error: any) {
       alert(error.message);
     }

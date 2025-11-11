@@ -13,13 +13,12 @@ export default function Home() {
         {/* 2. IMAGEN DE FONDO */}
         {/* Ocupa todo el 'section', está en el fondo (z-0) */}
         <Image
-          src="/hero-background.jpg" // ⬅️ ¡Asegúrate de tener esta imagen en 'public'!
-          alt="Fondo de Construtech ISL"
-          layout="fill" // 'fill' hace que llene el contenedor
-          objectFit="cover" // 'cover' recorta la imagen para que llene el espacio sin deformarse
-          className="z-0"
-          priority // 'priority' le dice a Next.js que cargue esta imagen primero
-        />
+            src="/hero-background.jpg"
+             alt="Fondo de Construtech ISL"
+              fill // ⬅️ Nueva propiedad
+             className="z-0 object-cover" // ⬅️ 'object-cover' ahora es una clase
+             priority
+           />
         
         {/* 3. CAPA OSCURA (Para que el texto se lea bien) */}
         {/* Se pone encima de la imagen (z-10) pero debajo del texto (z-20) */}
