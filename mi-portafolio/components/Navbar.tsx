@@ -80,7 +80,7 @@ export default async function Navbar() {
           </div>
           {/* --- FIN DE LA FUSIÓN 1 --- */}
 
-          <Link href="/#proyectos" className="hover:text-blue-600 transition-colors">
+          <Link href="/proyectos" className="hover:text-blue-600 transition-colors">
             Proyectos
           </Link>
           <Link href="/quienes-somos" className="hover:text-blue-600 transition-colors">

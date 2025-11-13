@@ -1,11 +1,48 @@
-import Image from 'next/image';
+import { createClient } from '@/utils/supabase/server';
 import AnimatedSection from '@/components/AnimatedSection';
-import { AcademicCapIcon, BriefcaseIcon } from '@heroicons/react/24/solid'; // ⬅️ Iconos para estudios y experiencia
+import StaffGrid from '@/components/StaffGrid'; // ⬅️ Importa el nuevo componente
+import { ExclamationTriangleIcon } from '@heroicons/react/24/solid';
 
-export default function PersonalPage() {
+// 1. Definimos el tipo de datos que esperamos de la RPC
+type StaffMember = {
+  id: string;
+  name: string;
+  title: string;
+  experience: string;
+  education: string;
+  quote: string;
+  image_url: string;
+  average_rating: number | null;
+};
+
+export default async function PersonalPage() {
+  
+  const supabase = await createClient();
+
+  // 2. Verificamos si hay un usuario (para el Lazy Login)
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // 3. Llamamos a la FUNCIÓN de base de datos que creamos
+  const { data: staff, error } = await supabase
+    .rpc('get_staff_with_ratings') // ⬅️ La magia está aquí
+    .returns<StaffMember[]>();
+
+  // 4. Manejo de Errores
+  if (error || !Array.isArray(staff)) {
+    console.error("Error al cargar el personal:", error);
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center p-24 pt-28 bg-white">
+        <div className="text-center">
+          <ExclamationTriangleIcon className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Error al Cargar al Personal</h1>
+          <p className="text-gray-600">No pudimos conectarnos a la base de datos.</p>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="flex min-h-screen flex-col items-center p-12 md:p-24 pt-28 bg-gray-50">
-      
       <div className="w-full max-w-6xl mx-auto">
         
         <AnimatedSection>
@@ -19,126 +56,10 @@ export default function PersonalPage() {
           </p>
         </AnimatedSection>
 
-        {/* --- Contenedor de la Rejilla de Perfiles --- */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
-          {/* --- Tarjeta de Perfil 1 --- */}
-          <AnimatedSection delay={0.2}>
-            <div className="bg-white rounded-lg shadow-xl overflow-hidden border border-gray-200 h-full flex flex-col">
-              {/* Imagen (Asegúrate de que la ruta sea correcta) */}
-              <Image
-                src="/equipo/carlos-mendoza.jpg" // ⬅️ CAMBIA ESTO por tu foto
-                alt="Foto de Carlos Mendoza"
-                width={500}
-                height={500}
-                className="w-full h-64 object-cover object-center" // 'object-cover' recorta la imagen
-              />
-              {/* Contenido de texto */}
-              <div className="p-6 flex-grow">
-                <h2 className="text-2xl font-bold text-gray-900 mb-1">
-                  Carlos Mendoza
-                </h2>
-                <p className="text-md font-semibold text-blue-700 mb-4">
-                  Maestro Carpintero y Ebanista
-                </p>
-
-                {/* --- Estudios y Experiencia --- */}
-                <div className="space-y-3 mb-4">
-                  <div className="flex items-center text-sm text-gray-700">
-                    <BriefcaseIcon className="h-5 w-5 mr-2 text-gray-500" />
-                    <strong>Experiencia:</strong>&nbsp;15+ años en el sector
-                  </div>
-                  <div className="flex items-center text-sm text-gray-700">
-                    <AcademicCapIcon className="h-5 w-5 mr-2 text-gray-500" />
-                    <strong>Estudios:</strong>&nbsp;Técnico en Ebanistería
-                  </div>
-                </div>
-                
-                {/* --- El toque de "Empatía" --- */}
-                <p className="text-gray-600 text-sm italic border-t pt-4">
-                  "La madera tiene su propio lenguaje. Mi trabajo es 
-                  traducirlo en un mueble que dure para toda la vida."
-                </p>
-              </div>
-            </div>
-          </AnimatedSection>
-
-          {/* --- Tarjeta de Perfil 2 (Ejemplo con placeholder) --- */}
-          <AnimatedSection delay={0.4}>
-            <div className="bg-white rounded-lg shadow-xl overflow-hidden border border-gray-200 h-full flex flex-col">
-              {/* Placeholder si no tienes imagen */}
-              <Image
-                src="/equipo/ana-silva.jpg" // ⬅️ CAMBIA ESTO por tu foto
-                alt="Foto de ana silva"
-                width={500}
-                height={500}
-                className="w-full h-64 object-cover object-center" // 'object-cover' recorta la imagen
-              />
-              
-              <div className="p-6 flex-grow">
-                <h2 className="text-2xl font-bold text-gray-900 mb-1">
-                  Ana Silva
-                </h2>
-                <p className="text-md font-semibold text-blue-700 mb-4">
-                  Electricista Certificada
-                </p>
-                <div className="space-y-3 mb-4">
-                  <div className="flex items-center text-sm text-gray-700">
-                    <BriefcaseIcon className="h-5 w-5 mr-2 text-gray-500" />
-                    <strong>Experiencia:</strong>&nbsp;8 años en residencial
-                  </div>
-                  <div className="flex items-center text-sm text-gray-700">
-                    <AcademicCapIcon className="h-5 w-5 mr-2 text-gray-500" />
-                    <strong>Estudios:</strong>&nbsp;Téc. en Instalaciones Eléctricas
-                  </div>
-                </div>
-                <p className="text-gray-600 text-sm italic border-t pt-4">
-                  "La seguridad no es negociable. Me aseguro de que 
-                  cada conexión sea perfecta y segura para tu familia."
-                </p>
-              </div>
-            </div>
-          </AnimatedSection>
-          
-          {/* --- Tarjeta de Perfil 3 (Ejemplo con placeholder) --- */}
-          <AnimatedSection delay={0.6}>
-            <div className="bg-white rounded-lg shadow-xl overflow-hidden border border-gray-200 h-full flex flex-col">
-              <Image
-                src="/equipo/luis-torres.jpg" // ⬅️ CAMBIA ESTO por tu foto
-                alt="Foto de luis torres"
-                width={500}
-                height={500}
-                className="w-full h-64 object-cover object-center" // 'object-cover' recorta la imagen
-              />
-              
-              <div className="p-6 flex-grow">
-                <h2 className="text-2xl font-bold text-gray-900 mb-1">
-                  Luis Torres
-                </h2>
-                <p className="text-md font-semibold text-blue-700 mb-4">
-                  Plomero y Albañil
-                </p>
-                <div className="space-y-3 mb-4">
-                  <div className="flex items-center text-sm text-gray-700">
-                    <BriefcaseIcon className="h-5 w-5 mr-2 text-gray-500" />
-                    <strong>Experiencia:</strong>&nbsp;20 años
-                  </div>
-                  <div className="flex items-center text-sm text-gray-700">
-                    <AcademicCapIcon className="h-5 w-5 mr-2 text-gray-500" />
-                    <strong>Estudios:</strong>&nbsp;Maestro de Obra
-                  </div>
-                </div>
-                <p className="text-gray-600 text-sm italic border-t pt-4">
-                  "No hay problema pequeño. Desde una fuga hasta 
-                  levantar un muro, lo hago bien a la primera."
-                </p>
-              </div>
-            </div>
-          </AnimatedSection>
-          
-          {/* (Puedes añadir más tarjetas aquí) */}
-          
-        </div>
+        {/* --- 5. Renderizamos el Componente de Cliente --- */}
+        {/* Pasamos los datos del servidor (staff) y el usuario (user) */}
+        <StaffGrid staff={staff} user={user} />
+        
       </div>
     </main>
   );
