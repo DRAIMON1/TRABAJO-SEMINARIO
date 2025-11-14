@@ -1,32 +1,37 @@
 "use client";
 
-import { createTool } from "@/app/admin/actions"; // 1. Importa la Server Action
+import { createTool } from "@/app/admin/actions";
 import { useRef, useState } from "react";
 
 export default function AddToolForm() {
-  // 2. Usamos 'useRef' para poder limpiar el formulario
   const formRef = useRef<HTMLFormElement>(null);
   
-  // 3. Estado para mostrar un mensaje de éxito
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  // 1. Estados mejorados para manejar la carga y los errores
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formMessage, setFormMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
-  // 4. Función 'wrapper' que llama a la Server Action
   const handleSubmit = async (formData: FormData) => {
+    setIsSubmitting(true); // 2. Mostrar "Subiendo..."
+    setFormMessage(null);
+
     const result = await createTool(formData);
 
     if (result.success) {
-      setSuccessMessage("¡Herramienta añadida con éxito!");
+      setFormMessage({ type: 'success', text: "¡Herramienta añadida con éxito!" });
       formRef.current?.reset(); // Limpia el formulario
-      setTimeout(() => setSuccessMessage(null), 3000); // Oculta el mensaje después de 3s
+      setTimeout(() => setFormMessage(null), 3000); // Oculta el mensaje
     } else {
-      // (Aquí podemos manejar el 'result.error' si lo deseamos)
-      alert("Error: " + result.error);
+      // 3. Mostrar el error
+      setFormMessage({ type: 'error', text: result.error || "Ocurrió un error." });
     }
+    
+    setIsSubmitting(false); // 4. Reactivar el botón
   };
 
   return (
-    // 5. El formulario llama a la acción 'handleSubmit'
     <form ref={formRef} action={handleSubmit} className="space-y-4">
+      
+      {/* (Nombre Herramienta - sin cambios) */}
       <div>
         <label className="block text-sm font-medium text-gray-300">Nombre De La Herramienta</label>
         <input
@@ -37,6 +42,7 @@ export default function AddToolForm() {
         />
       </div>
 
+      {/* (Stock y Precio - sin cambios) */}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-300">Stock Disponible</label>
@@ -59,6 +65,7 @@ export default function AddToolForm() {
         </div>
       </div>
 
+      {/* (Categoría - sin cambios) */}
       <div>
         <label className="block text-sm font-medium text-gray-300">Categoría</label>
         <input
@@ -70,17 +77,25 @@ export default function AddToolForm() {
         />
       </div>
 
+      {/* --- 5. ¡EL CAMBIO! De 'text' a 'file' --- */}
       <div>
-        <label className="block text-sm font-medium text-gray-300">URL de Imagen</label>
+        <label className="block text-sm font-medium text-gray-300">Imagen de la Herramienta</label>
         <input
-          type="text"
-          name="image_url"
-          placeholder="Ej: /herramientas/mi-foto.jpg"
-          className="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 p-2 text-white"
+          type="file"
+          name="image_file" // ⬅️ El 'name' ha cambiado
+          accept="image/png, image/jpeg, image/webp" // ⬅️ Acepta solo imágenes
+          className="mt-1 block w-full text-sm text-gray-300
+                     file:mr-4 file:py-2 file:px-4
+                     file:rounded-md file:border-0
+                     file:text-sm file:font-semibold
+                     file:bg-blue-600 file:text-white
+                     hover:file:bg-blue-700"
           required
         />
       </div>
+      {/* --- FIN DEL CAMBIO --- */}
 
+      {/* (Descripción - sin cambios) */}
       <div>
         <label className="block text-sm font-medium text-gray-300">Descripción</label>
         <textarea
@@ -90,17 +105,24 @@ export default function AddToolForm() {
         />
       </div>
 
+      {/* 6. Botón actualizado con estado de carga */}
       <button
         type="submit"
-        className="w-full p-3 bg-blue-600 text-white rounded-md font-bold hover:bg-blue-700"
+        disabled={isSubmitting} // ⬅️ Deshabilitar mientras sube
+        className="w-full p-3 bg-blue-600 text-white rounded-md font-bold 
+                   hover:bg-blue-700
+                   disabled:bg-gray-500 disabled:cursor-not-allowed"
       >
-        Añadir Herramienta
-      </button>
+        {isSubmitting ? 'Subiendo y Guardando...' : 'Añadir Herramienta'}
+      </button> 
+      {/* ⬆️ LA ETIQUETA DE CIERRE ES </button>, NO </En> */}
 
-      {/* 6. Mensaje de éxito */}
-      {successMessage && (
-        <p className="text-green-400 text-center font-semibold">
-          {successMessage}
+      {/* 7. Mensajes de éxito o error */}
+      {formMessage && (
+        <p className={`text-center font-semibold ${
+          formMessage.type === 'success' ? 'text-green-400' : 'text-red-400'
+        }`}>
+          {formMessage.text}
         </p>
       )}
     </form>

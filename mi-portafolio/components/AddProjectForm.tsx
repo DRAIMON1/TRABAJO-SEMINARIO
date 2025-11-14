@@ -3,7 +3,18 @@
 import { createProject } from "@/app/admin/actions";
 import { useRef, useState } from "react";
 
-export default function AddProjectForm() {
+// --- 1. Definimos los tipos que esperamos recibir ---
+type StaffListMember = {
+  id: string;
+  name: string;
+};
+
+type Props = {
+  staffList: StaffListMember[]; // ⬅️ Aceptamos la lista
+};
+
+// --- 2. Añadimos 'staffList' a las props ---
+export default function AddProjectForm({ staffList }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -15,7 +26,7 @@ export default function AddProjectForm() {
       formRef.current?.reset();
       setTimeout(() => setSuccessMessage(null), 3000);
     } else {
-      alert("Error: " + result.error);
+      alert("Error: " + (result.error || "Error desconocido"));
     }
   };
 
@@ -44,15 +55,23 @@ export default function AddProjectForm() {
         />
       </div>
       
+      {/* --- 3. ¡EL GRAN CAMBIO! (De Input a Select) --- */}
       <div>
-        <label className="block text-sm font-medium text-gray-300">ID del Profesional (staff_id)</label>
-        <input
-          type="text"
-          name="staff_id"
-          placeholder="Pega el ID del profesional (de la tabla 'staff')"
+        <label className="block text-sm font-medium text-gray-300">Profesional Asignado</label>
+        <select
+          name="staff_id" // El 'name' sigue siendo 'staff_id'
           className="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 p-2 text-white"
+          defaultValue="" // Importante para el placeholder
           required
-        />
+        >
+          <option value="" disabled>Selecciona un profesional...</option>
+          {/* Mapeamos la lista que recibimos */}
+          {staffList.map((staff) => (
+            <option key={staff.id} value={staff.id}>
+              {staff.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div>

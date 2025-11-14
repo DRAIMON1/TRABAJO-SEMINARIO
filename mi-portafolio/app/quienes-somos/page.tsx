@@ -8,28 +8,28 @@ import AnimatedSection from '@/components/AnimatedSection';
 // --- Datos del equipo (sin cambios, solo las fotos de perfil) ---
 const team = [
   {
-    name: "Draimon (Tu Nombre)",
+    name: "Draimon Andres Osorio",
     title: "Ingeniero de Sistemas / Arquitecto de Software",
     img: "/equipo/draimon.png",
     bio: "Soy el fundador y arquitecto de la plataforma. Mi pasión es usar la tecnología para construir soluciones eficientes que resuelvan problemas del mundo real, optimizando cada clic del proceso de alquiler y contratación."
   },
   // ... resto de tu equipo ...
   {
-    name: "[Nombre Socio 2]",
+    name: "Hamilton Narvaez",
     title: "Ingeniero Industrial / Director de Operaciones",
     img: "/equipo/hamilton.jpeg",
     bio: "Especialista en optimización de procesos. Mi trabajo es asegurar que la logística, el inventario y la contratación de personal funcionen sin fricciones, garantizando un servicio de calidad y puntualidad."
   },
   {
-    name: "[Nombre Socio 3]",
+    name: "Yerson Escobar",
     title: "Especialista en Logística",
-    img: "/equipo/socio3.jpg",
+    img: "/equipo/yerson.jpeg",
     bio: "Con experiencia en cadena de suministro, me encargo de la gestión de inventario y la logística de entrega. Mi objetivo es que tengas la herramienta correcta en el momento exacto que la necesitas."
   },
   {
-    name: "[Nombre Socio 4]",
+    name: "Andres Mendez",
     title: "Especialista en Gestión de Inventarios",
-    img: "/equipo/socio4.jpg",
+    img: "/equipo/favio.jpeg",
     bio: "Mi enfoque es el análisis de datos para predecir la demanda y asegurar que nuestro stock de herramientas y la disponibilidad de nuestro personal calificado siempre cumplan con tus necesidades."
   }
 ];
