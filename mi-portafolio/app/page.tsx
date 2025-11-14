@@ -131,22 +131,7 @@ export default function Home() {
 {/* Aquí usaremos un fondo oscuro. 
   Más adelante, te enseñaré a cambiar 'bg-gray-900' por una imagen de fondo.
 */}
-<AnimatedSection>
-<section className="w-full bg-gray-900 py-24 px-8 text-white text-center">
-  <h2 className="text-4xl font-bold mb-6 max-w-3xl mx-auto">
-    ¿Listo para llevar tu proyecto al siguiente nivel?
-  </h2>
-  <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
-    Motivando a los clientes a obtener nuestros servicios.
-  </p>
-  <Link 
-    href="/#contactanos" // Este 'id' lo crearemos en el Footer
-    className="px-8 py-3 bg-blue-600 text-white font-bold rounded-lg text-lg hover:bg-blue-700 transition-colors"
-  >
-    Contáctanos
-  </Link>
-</section>
-</AnimatedSection>
+
     </main>
   );
 }

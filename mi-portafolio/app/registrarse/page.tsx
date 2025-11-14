@@ -19,15 +19,18 @@ export default function RegistrarsePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
-  // --- LÓGICA DE REGISTRO (SIN CAMBIOS) ---
-  const handleSignUp = async (event: React.FormEvent<HTMLFormElement>) => {
+ const handleSignUp = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsLoading(true);
     setFormError(null);
 
     const supabase = createClient();
     
-    // 1. Crea el usuario en 'auth.users'
+    // 1. Prepara el valor del género
+    const genderToSave = gender === 'Otro' ? otherGender : gender;
+
+    // 2. ¡EL GRAN CAMBIO!
+    // Enviamos TODOS los datos del formulario dentro de 'options.data'
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
@@ -35,6 +38,10 @@ export default function RegistrarsePage() {
         data: {
           full_name: fullName,
           nickname: nickname,
+          cedula: cedula,
+          phone_number: phoneNumber,
+          gender: genderToSave,
+          birth_year: parseInt(birthYear),
         }
       }
     });
@@ -44,32 +51,12 @@ export default function RegistrarsePage() {
       setIsLoading(false);
       return;
     }
-    if (!authData.user) {
-      setFormError("No se pudo crear el usuario.");
-      setIsLoading(false);
-      return;
-    }
 
-    // 2. Lógica de Género
-    const genderToSave = gender === 'Otro' ? otherGender : gender;
+    // 3. ¡BORRAMOS EL BLOQUE '.update()' ENTERO!
+    // El trigger de SQL ya hizo todo el trabajo.
+    // No necesitamos la variable 'profileError'.
 
-    // 3. Inserta los datos en 'profiles'
-    const { error: profileError } = await supabase.from('profiles').insert({
-      id: authData.user.id,
-      full_name: fullName,
-      cedula: cedula,
-      nickname: nickname,
-      phone_number: phoneNumber,
-      gender: genderToSave,
-      birth_year: parseInt(birthYear),
-    });
-
-    if (profileError) {
-      setFormError(profileError.message);
-      setIsLoading(false);
-      return;
-    }
-
+    // 4. ¡Todo salió bien!
     alert('¡Registro exitoso! Por favor, revisa tu email para confirmar.');
     window.location.href = '/servicios/alquiler';
   };

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 // Importamos TODOS los íconos que necesitamos
 import { MagnifyingGlassIcon, ChevronDownIcon } from '@heroicons/react/24/solid';
 // 1. Importamos el cliente de SERVIDOR
@@ -18,17 +19,26 @@ export default async function Navbar() {
   return (
     <nav className="fixed top-0 left-0 w-full bg-white text-gray-900 shadow-md p-4 z-50 flex justify-between items-center">
       
-      {/* Lado Izquierdo: Logo y Nombre (Sin cambios) */}
+      {/* --- LADO IZQUIERDO (CORREGIDO) --- */}
       <div className="flex items-center space-x-4">
+        {/* 2. El Link debe apuntar a la página de INICIO (href="/") */}
         <Link href="/" className="flex items-center space-x-2">
-          <div className="w-10 h-10 bg-blue-600 rounded-lg">
-            {/* Logo */}
-          </div>
+          
+          {/* 3. Reemplaza el 'div' azul con el componente 'Image' */}
+          <Image
+            src="/construtech.png" // 4. La ruta a tu logo (desde la carpeta 'public')
+            alt="Construtech ISL Logo"
+            width={70}  // 5. Define el ancho (ej: 40px)
+            height={50} // 6. Define el alto (ej: 40px)
+            className="rounded-lg" // (Opcional: si tu logo es cuadrado y lo quieres redondear)
+          />
+          
           <span className="text-2xl font-bold text-gray-900">
             Construtech ISL
           </span>
         </Link>
       </div>
+      {/* --- FIN DE LA CORRECCIÓN --- */}
 
       {/* Lado Derecho: Links y Búsqueda */}
       <div className="flex items-center space-x-8">
