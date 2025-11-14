@@ -10,14 +10,14 @@ const team = [
   {
     name: "Draimon (Tu Nombre)",
     title: "Ingeniero de Sistemas / Arquitecto de Software",
-    img: "/equipo/draimon.jpg",
+    img: "/equipo/draimon.png",
     bio: "Soy el fundador y arquitecto de la plataforma. Mi pasión es usar la tecnología para construir soluciones eficientes que resuelvan problemas del mundo real, optimizando cada clic del proceso de alquiler y contratación."
   },
   // ... resto de tu equipo ...
   {
     name: "[Nombre Socio 2]",
     title: "Ingeniero Industrial / Director de Operaciones",
-    img: "/equipo/socio2.jpg",
+    img: "/equipo/hamilton.jpeg",
     bio: "Especialista en optimización de procesos. Mi trabajo es asegurar que la logística, el inventario y la contratación de personal funcionen sin fricciones, garantizando un servicio de calidad y puntualidad."
   },
   {
