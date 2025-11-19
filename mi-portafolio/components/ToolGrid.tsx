@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"; // 1. Importa useEffect
 import Image from "next/image";
 import { DayPicker, type DateRange } from "react-day-picker";
 import "react-day-picker/dist/style.css"; 
-import { createReservation, getBookedDates } from "@/app/servicios/alquiler/actions";
+import { createPaymentPreference, getBookedDates } from "@/app/servicios/alquiler/actions";
 import { useRouter } from "next/navigation"; 
 import { User } from '@supabase/supabase-js'; // 2. Importa el tipo 'User'
 
@@ -85,19 +85,13 @@ export default function ToolGrid({ tools, user }: ToolGridProps) {
     return selectedTool.price_per_day; 
   };
 
-  // --- Función para manejar el envío del formulario ---
   const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setFormError(null); 
-    setFormSuccess(null); // Limpia mensajes antiguos
+    setFormSuccess(null);
 
-    // Validación del cliente
-    if (!selectedDate) {
+    if (!selectedDate || !selectedTool) {
       setFormError("Por favor, selecciona una fecha en el calendario.");
-      return;
-    }
-    if (!selectedTool) {
-      setFormError("Error: No hay ninguna herramienta seleccionada.");
       return;
     }
 
@@ -109,7 +103,7 @@ export default function ToolGrid({ tools, user }: ToolGridProps) {
     if (rentalType === 'daily') endDate.setDate(endDate.getDate() + 1);
     if (rentalType === 'project') endDate.setMonth(endDate.getMonth() + projectMonths);
 
-    const reservationData = {
+    const checkoutData = {
       tool_id: selectedTool.id,
       start_date: selectedDate,
       end_date: endDate,
@@ -117,24 +111,21 @@ export default function ToolGrid({ tools, user }: ToolGridProps) {
       total_price: price,
     };
 
-    // Llamada a la Server Action
-    const result = await createReservation(reservationData);
+    // --- ¡AQUÍ ESTÁ EL CAMBIO! ---
+    // Llamamos a la nueva acción de Mercado Pago
+    const result = await createPaymentPreference(checkoutData);
 
-    if (result.success) {
-      setFormSuccess("¡Reserva exitosa! Actualizando el catálogo...");
-      
-      // Esperamos 2 segundos para que el usuario lea el mensaje
-      setTimeout(() => {
-        router.refresh(); // Refresca los datos del servidor
-        handleCloseModal();
-      }, 2000);
-      
+    if (result.success && result.url) {
+      // ÉXITO: Redirigimos al usuario a la página de pago
+      window.location.href = result.url;
     } else {
-      setFormError(result.error); // Muestra el error del servidor
-      setIsSubmitting(false); // Reactiva el botón si hay un error
+      // ERROR: Mostramos el error (ej. "Sin stock")
+      setFormError(result.error ?? "Ocurrió un error desconocido.");
+      setIsSubmitting(false); // Reactivamos el botón solo si hay error
     }
+    // Ya no hay 'setTimeout' ni 'router.refresh()',
+    // porque el usuario es redirigido.
   };
-
   return (
     <>
       {/* --- 1. LA REJILLA DE HERRAMIENTAS --- */}
@@ -165,9 +156,14 @@ export default function ToolGrid({ tools, user }: ToolGridProps) {
             <div className="p-4 flex flex-col flex-grow">
               <h3 className="text-2xl font-semibold text-blue-700">{tool.name}</h3>
               <p className="text-gray-600 text-sm mt-2 flex-grow">{tool.description}</p>
+              
+              {/* --- 🚀 CAMBIO DE PRECIO (TARJETA) --- */}
               <p className="text-xl font-bold text-gray-900 mt-4 text-right">
-                ${tool.price_per_day} <span className="text-sm font-normal">/ día</span>
+                {/* Formateamos el número a pesos colombianos */}
+                ${tool.price_per_day.toLocaleString('es-CO')} 
+                <span className="text-sm font-normal"> COP / Día</span>
               </p>
+              {/* --- FIN DEL CAMBIO --- */}
             </div>
           </button>
         ))}
@@ -243,15 +239,18 @@ export default function ToolGrid({ tools, user }: ToolGridProps) {
                 </label>
               )}
 
-              {/* Cálculo de Precio */}
+              {/* --- 🚀 CAMBIO DE PRECIO (MODAL) --- */}
               <div className="my-6">
                 <span className="text-xl text-green-700">Precio Total Estimado:</span>
                 <span className="text-3xl font-bold text-blue-700 block">
-                  ${calculatePrice().toFixed(2)}
+                  {/* Formateamos el número y añadimos 'COP' */}
+                  ${calculatePrice().toLocaleString('es-CO')}
+                  <span className="text-lg text-gray-700 ml-2">COP</span>
                 </span>
               </div>
+              {/* --- FIN DEL CAMBIO --- */}
 
-              {/* Botón de Confirmar */}
+              {/* 3. BOTÓN ACTUALIZADO */}
               <button 
                 type="submit" 
                 disabled={isSubmitting} 
@@ -259,10 +258,10 @@ export default function ToolGrid({ tools, user }: ToolGridProps) {
                            hover:bg-green-700 transition-colors
                            disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? "Reservando..." : "Confirmar Reserva"}
+                {isSubmitting ? "Generando link de pago..." : "Ir a Pagar"}
               </button>
               
-              {/* Mensajes de Error y Éxito */}
+              {/* (Mensajes de Error y Éxito - sin cambios) */}
               {formError && (
                 <p className="text-red-600 text-center font-semibold mt-4">
                   {formError}

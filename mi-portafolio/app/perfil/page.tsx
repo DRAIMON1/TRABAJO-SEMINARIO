@@ -113,12 +113,15 @@ export default async function PerfilPage() {
                     </p>
                   </div>
                   
+                  {/* --- 🚀 CAMBIO DE PRECIO (PERFIL) --- */}
                   <div className="text-right">
                     <span className="text-lg font-bold text-gray-900">
-                      ${res.total_price.toFixed(2)}
+                      ${res.total_price.toLocaleString('es-CO')}
+                      <span className="text-sm font-normal text-gray-700 ml-1">COP</span>
                     </span>
                     <p className="text-sm text-gray-500">Precio final</p>
                   </div>
+                  {/* --- FIN DEL CAMBIO --- */}
 
                   {/* --- 4. EL FORMULARIO DE CANCELACIÓN --- */}
                   <div className="ml-4">
