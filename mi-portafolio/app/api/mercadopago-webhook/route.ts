@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-// 1. IMPORTACIÓN CORREGIDA (SDK v2)
 import { MercadoPagoConfig, Payment } from 'mercadopago';
 
-// 2. CONFIGURACIÓN CORREGIDA (SDK v2)
 const client = new MercadoPagoConfig({
   accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN!,
 });
@@ -11,22 +9,24 @@ const client = new MercadoPagoConfig({
 export async function POST(request: Request) {
   const body = await request.json();
 
+  // Respondemos rápido a MP para que sepa que recibimos el mensaje
   if (body.type === 'payment') {
     const paymentId = body.data.id;
 
     try {
-      // 3. OBTENER PAGO CORREGIDO (SDK v2)
       const paymentClient = new Payment(client);
       const payment = await paymentClient.get({ id: Number(paymentId) });
       
-      // 4. VERIFICACIÓN CORREGIDA (SDK v2)
-      if (payment && payment.status === 'approved' && payment.metadata) {
-        const metadata: any = payment.metadata; // Usamos 'any' para metadata
+      // --- CAMBIO DE SEGURIDAD ---
+      // Verificamos si status está en la raíz o en .body (depende de la versión)
+      // @ts-ignore
+      const status = payment.status || payment.body?.status;
+      // @ts-ignore
+      const metadata = payment.metadata || payment.body?.metadata;
 
-        // 5. 'await' AÑADIDO
+      if (status === 'approved' && metadata) {
         const supabase = await createClient();
         
-        // 6. Guardamos la reserva
         const { error: insertError } = await supabase.from("reservations").insert({
           tool_id: metadata.tool_id,
           user_id: metadata.user_id,
@@ -37,10 +37,11 @@ export async function POST(request: Request) {
         });
 
         if (insertError) {
-          throw new Error(`Error al guardar reserva: ${insertError.message}`);
+          console.error("Error guardando reserva:", insertError);
+          // No lanzamos error para que MP no siga reintentando infinitamente si es un error de datos
+          return NextResponse.json({ error: insertError.message }, { status: 200 }); 
         }
 
-        // 7. Actualizamos el stock
         const newStock = Number(metadata.stock_available) - 1;
         const { error: updateError } = await supabase
           .from('tools')
@@ -48,15 +49,17 @@ export async function POST(request: Request) {
           .eq('id', metadata.tool_id);
         
         if (updateError) {
-          throw new Error(`Error al actualizar stock: ${updateError.message}`);
+           console.error("Error actualizando stock:", updateError);
         }
       }
       
       return NextResponse.json({ success: true }, { status: 200 });
 
     } catch (error: any) {
-      console.error('Error en Webhook de Mercado Pago:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error('Error CRÍTICO en Webhook:', error);
+      // Devolvemos 200 incluso si hay error interno para evitar bucles de reintentos de MP
+      // (Revisar logs de Vercel para depurar)
+      return NextResponse.json({ error: error.message }, { status: 200 });
     }
   }
 

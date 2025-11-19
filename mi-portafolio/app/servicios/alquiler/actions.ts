@@ -3,19 +3,13 @@
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
-// 1. IMPORTACIÓN CORREGIDA (SDK v2)
 import { MercadoPagoConfig, Preference } from 'mercadopago';
 
-// 2. CONFIGURACIÓN CORREGIDA (SDK v2)
-// Creamos un 'cliente' con nuestras credenciales
+// Configuración de Mercado Pago (SDK v2)
 const client = new MercadoPagoConfig({
-  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN!, // ⬅️ Corregido a camelCase
+  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN!,
 });
-// --- 🚀 AÑADE ESTA LÍNEA DE PRUEBA JUSTO AQUÍ ---
-console.log("CLAVE DE MERCADO PAGO EN USO:", process.env.MERCADOPAGO_ACCESS_TOKEN);
-// --- FIN DE LA LÍNEA DE PRUEBA ---
 
-// (Tipo para los datos del formulario)
 type CheckoutData = {
   tool_id: string;
   start_date: Date;
@@ -23,22 +17,21 @@ type CheckoutData = {
   rental_type: 'hourly' | 'daily' | 'project';
   total_price: number;
 };
-// (Tipo para los rangos de fechas)
+
 type DateRange = {
   from: Date;
   to: Date;
 };
 
-// --- FUNCIÓN 'createPaymentPreference' ---
 export async function createPaymentPreference(formData: CheckoutData) {
-  // 3. 'await' AÑADIDO
   const supabase = await createClient();
 
-  // (Validar Usuario)
+  // ... (Validaciones de usuario, stock y reservas IGUAL QUE ANTES) ...
+  // ... (Copia y pega tus validaciones aquí si no quieres reescribirlas) ...
+  // ... (Validar Usuario)
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) { return { success: false, error: "Debes iniciar sesión." }; }
 
-  // (Validar Stock y Fechas)
   const { data: toolData, error: stockError } = await supabase
     .from('tools').select('name, stock_available').eq('id', formData.tool_id).single();
   if (stockError || !toolData) { return { success: false, error: "No se pudo encontrar la herramienta." }; }
@@ -53,10 +46,17 @@ export async function createPaymentPreference(formData: CheckoutData) {
     return { success: false, error: "No hay más stock disponible para esta herramienta en la fecha seleccionada." }; 
   }
 
-  // (Crear Preferencia de Pago con SDK v2)
   try {
-    // 4. 'await' AÑADIDO a headers()
-    const origin = (await headers()).get('origin') || 'http://localhost:3000';
+    // Obtenemos los encabezados
+    const headersList = await headers();
+    const host = headersList.get('host');
+
+    // Lógica inteligente:
+    // 1. Si estamos en localhost, usamos localhost.
+    // 2. Si estamos en Vercel (producción), usamos tu dominio real automáticamente.
+    const origin = host && host.includes('localhost') 
+      ? `http://${host}` 
+      : `https://www.construtech-isl.pro`; // ⬅️ FORZAMOS TU DOMINIO EN PRODUCCIÓN
     
     const { data: profile } = await supabase
       .from('profiles').select('full_name, phone_number').eq('id', user.id).single();
@@ -64,7 +64,7 @@ export async function createPaymentPreference(formData: CheckoutData) {
     const preferenceData = {
       items: [
         {
-          id: formData.tool_id, // ⬅️ 'id' REQUERIDO
+          id: formData.tool_id,
           title: `Alquiler: ${toolData.name}`,
           description: `Reserva del ${formData.start_date.toLocaleDateString('es-CO')} al ${formData.end_date.toLocaleDateString('es-CO')}`,
           quantity: 1,
@@ -73,15 +73,19 @@ export async function createPaymentPreference(formData: CheckoutData) {
         },
       ],
       payer: {
-        name: profile?.full_name || 'Nombre no disponible',
+        name: profile?.full_name || 'Usuario',
         email: user.email,
         phone: { number: profile?.phone_number || '0000000' },
       },
-      back_urls: { // ⬅️ 'back_urls' en plural
+      // 2. USAMOS 'back_urls' (PLURAL)
+      back_urls: {
         success: `${origin}/perfil?payment=success`,
         failure: `${origin}/servicios/alquiler?payment=cancelled`,
         pending: `${origin}/perfil?payment=pending`,
       },
+      // 3. ACTIVAMOS EL RETORNO AUTOMÁTICO
+      //auto_return: 'approved',
+      
       notification_url: `${origin}/api/mercadopago-webhook`,
       metadata: {
         user_id: user.id,
@@ -110,7 +114,8 @@ export async function createPaymentPreference(formData: CheckoutData) {
 // ... (Tus funciones 'getBookedDates' y 'cancelReservation' van aquí) ...
 
 // --- FUNCIÓN 'getBookedDates' (MODIFICADA) ---
-export async function getBookedDates(toolId: string) {
+// Añade ': Promise<DateRange[]>' al final
+export async function getBookedDates(toolId: string): Promise<DateRange[]> {
   
   const supabase = await createClient();
 
@@ -209,3 +214,4 @@ export async function cancelReservation(formData: FormData) {
   
   // 8. ¡No devolvemos nada! (void)
 }
+': Promise<DateRange[]>'
