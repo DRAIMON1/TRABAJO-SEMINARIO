@@ -90,47 +90,41 @@ export default async function PerfilPage() {
           {reservations && reservations.length > 0 && (
             <ul className="divide-y divide-gray-200">
               {reservations.map((res) => (
-                <li key={res.id} className="p-4 flex items-center space-x-4">
+                <li key={res.id} className="p-4 flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 border-b last:border-0">
                   
-                  <Image
-                    src={res.tools?.image_url || '/herramientas/placeholder.jpg'}
-                    alt={res.tools?.name || 'Herramienta'}
-                    width={80}
-                    height={80}
-                    className="w-20 h-20 rounded-lg object-cover border"
-                  />
+                  {/* Imagen (Centrada en móvil, izquierda en PC) */}
+                  <div className="relative w-full sm:w-20 h-40 sm:h-20 flex-shrink-0">
+                    <Image
+                      src={res.tools?.image_url || '/herramientas/placeholder.jpg'}
+                      alt={res.tools?.name || 'Herramienta'}
+                      fill
+                      className="rounded-lg object-cover"
+                    />
+                  </div>
                   
-                  <div className="flex-grow">
+                  {/* Detalles */}
+                  <div className="flex-grow w-full text-center sm:text-left">
                     <h3 className="text-lg font-semibold text-blue-700">
                       {res.tools?.name || 'Herramienta no encontrada'}
                     </h3>
                     <p className="text-sm text-gray-600">
                       Reservado para: {new Date(res.start_date).toLocaleDateString('es-CO', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
+                        year: 'numeric', month: 'long', day: 'numeric'
                       })}
                     </p>
                   </div>
                   
-                  {/* --- 🚀 CAMBIO DE PRECIO (PERFIL) --- */}
-                  <div className="text-right">
-                    <span className="text-lg font-bold text-gray-900">
-                      ${res.total_price.toLocaleString('es-CO')}
-                      <span className="text-sm font-normal text-gray-700 ml-1">COP</span>
-                    </span>
-                    <p className="text-sm text-gray-500">Precio final</p>
-                  </div>
-                  {/* --- FIN DEL CAMBIO --- */}
+                  {/* Precio y Botón (Abajo en móvil, derecha en PC) */}
+                  <div className="w-full sm:w-auto flex flex-row sm:flex-col justify-between sm:justify-center items-center sm:items-end gap-2">
+                    <div className="text-right">
+                      <span className="text-lg font-bold text-gray-900">
+                        ${res.total_price.toLocaleString('es-CO')}
+                      </span>
+                    </div>
 
-                  {/* --- 4. EL FORMULARIO DE CANCELACIÓN --- */}
-                  <div className="ml-4">
-                    {/* La acción es la función sin 'bind' */}
                     <form action={cancelReservation}>
-                      {/* Pasamos los IDs como 'inputs' ocultos */}
                       <input type="hidden" name="reservationId" value={res.id} />
                       <input type="hidden" name="toolId" value={res.tool_id} />
-                      
                       <button 
                         type="submit"
                         className="px-3 py-1 bg-red-100 text-red-700 

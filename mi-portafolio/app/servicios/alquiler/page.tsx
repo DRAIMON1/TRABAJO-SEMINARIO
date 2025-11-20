@@ -26,7 +26,7 @@ export default async function AlquilerPage() {
   // 2. Obtenemos el usuario (si existe), pero NO redirigimos
   const { data: { user } } = await supabase.auth.getUser();
 
-  let greetingName = "al Catálogo"; // Saludo por defecto para invitados
+  let greetingName = "Bienvenido al Catálogo"; // Saludo por defecto para invitados
 
   if (user) {
     // Si hay un usuario, buscamos su apodo/nombre en 'profiles'

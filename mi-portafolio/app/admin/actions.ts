@@ -166,3 +166,98 @@ export async function getAllReservations() {
 
   return data;
 }
+// --- NUEVA FUNCIÓN: BORRAR HERRAMIENTA ---
+export async function deleteTool(formData: FormData) {
+  const supabase = await createClient();
+  
+  const toolId = formData.get('id') as string;
+  if (!toolId) return;
+
+  const { error } = await supabase
+    .from('tools')
+    .delete()
+    .eq('id', toolId);
+
+  if (error) {
+    console.error("Error al borrar herramienta:", error);
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath("/admin"); // Actualiza el panel
+  revalidatePath("/servicios/alquiler"); // Actualiza el catálogo público
+  return { success: true, error: null };
+}
+// --- NUEVA FUNCIÓN: BORRAR PERSONAL ---
+export async function deleteStaff(formData: FormData) {
+  const supabase = await createClient();
+  
+  const staffId = formData.get('id') as string;
+  if (!staffId) return;
+
+  const { error } = await supabase
+    .from('staff')
+    .delete()
+    .eq('id', staffId);
+
+  if (error) {
+    console.error("Error al borrar personal:", error);
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/servicios/personal");
+  return { success: true, error: null };
+}
+// --- 1. BORRAR PROYECTO ---
+export async function deleteProject(formData: FormData) {
+  const supabase = await createClient();
+  const projectId = formData.get('id') as string;
+  if (!projectId) return;
+
+  const { error } = await supabase
+    .from('projects')
+    .delete()
+    .eq('id', projectId);
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/proyectos");
+  return { success: true, error: null };
+}
+
+// --- 2. BORRAR RESERVA (ADMIN) ---
+// Esta función es especial: Borra la reserva Y devuelve el stock
+export async function deleteReservationAdmin(formData: FormData) {
+  const supabase = await createClient();
+  const reservationId = formData.get('id') as string;
+  const toolId = formData.get('toolId') as string;
+
+  if (!reservationId || !toolId) return;
+
+  // A. Borrar la reserva
+  const { error: deleteError } = await supabase
+    .from('reservations')
+    .delete()
+    .eq('id', reservationId);
+
+  if (deleteError) {
+    return { success: false, error: deleteError.message };
+  }
+
+  // B. Devolver el Stock (+1)
+  const { data: toolData } = await supabase
+    .from('tools').select('stock_available').eq('id', toolId).single();
+
+  if (toolData) {
+    await supabase.from('tools')
+      .update({ stock_available: Number(toolData.stock_available) + 1 })
+      .eq('id', toolId);
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/servicios/alquiler"); // Para que se actualice la burbuja
+  return { success: true, error: null };
+}

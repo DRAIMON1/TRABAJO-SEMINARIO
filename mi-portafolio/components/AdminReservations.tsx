@@ -1,64 +1,85 @@
-import { getAllReservations } from "@/app/admin/actions";
+"use client"; // ⬅️ Lo convertimos a Client Component
+
+import { useState } from "react";
 import Image from "next/image";
+import { TrashIcon } from "@heroicons/react/24/outline";
+import { deleteReservationAdmin } from "@/app/admin/actions";
+import toast from "react-hot-toast";
 
-export default async function AdminReservations() {
-  const reservations = await getAllReservations();
+// Recibimos las reservas como props en lugar de pedirlas aquí
+export default function AdminReservations({ reservations = [] }: { reservations: any[] }) {
+  
+  const handleDelete = async (id: string, toolId: string) => {
+    if (!confirm("¿Estás seguro? Esto cancelará la reserva y devolverá el stock.")) return;
 
-  if (!reservations || reservations.length === 0) {
-    return <p className="text-gray-400 italic">No hay reservas registradas.</p>;
+    const formData = new FormData();
+    formData.append('id', id);
+    formData.append('toolId', toolId); // Necesitamos el Tool ID para devolver el stock
+
+    const toastId = toast.loading("Cancelando reserva...");
+    const result = await deleteReservationAdmin(formData);
+    toast.dismiss(toastId);
+
+    if (result?.success) {
+      toast.success("Reserva cancelada y stock devuelto");
+    } else {
+      toast.error("Error al cancelar");
+    }
+  };
+
+  if (reservations.length === 0) {
+    return <p className="text-gray-400 italic p-4 text-center">No hay reservas registradas.</p>;
   }
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto bg-gray-800 rounded-lg border border-gray-700 mt-8">
       <table className="w-full text-sm text-left text-gray-300">
         <thead className="text-xs uppercase bg-gray-700 text-gray-200">
           <tr>
             <th className="px-6 py-3">Herramienta</th>
             <th className="px-6 py-3">Cliente</th>
             <th className="px-6 py-3">Fechas</th>
-            <th className="px-6 py-3">Ingreso</th>
             <th className="px-6 py-3">Estado</th>
+            <th className="px-6 py-3 text-center">Acción</th>
           </tr>
         </thead>
         <tbody>
-          {reservations.map((res: any) => (
-            <tr key={res.id} className="border-b border-gray-700 hover:bg-gray-800">
+          {reservations.map((res) => (
+            <tr key={res.id} className="border-b border-gray-700 hover:bg-gray-750">
               
-              {/* Columna Herramienta */}
-              <td className="px-6 py-4 font-medium text-white flex items-center gap-3">
-                <Image 
-                  src={res.tools?.image_url || '/herramientas/placeholder.jpg'} 
-                  alt="Tool" 
-                  width={40} height={40} 
-                  className="rounded object-cover w-10 h-10"
-                />
+              <td className="px-6 py-4 flex items-center gap-3 font-medium text-white">
+                <div className="relative w-8 h-8 rounded overflow-hidden flex-shrink-0">
+                   <Image src={res.tools?.image_url} alt="T" fill className="object-cover"/>
+                </div>
                 {res.tools?.name}
               </td>
 
-              {/* Columna Cliente */}
               <td className="px-6 py-4">
-                <div className="font-bold text-white">{res.profiles?.full_name}</div>
+                <div className="text-white">{res.profiles?.full_name || 'Usuario'}</div>
                 <div className="text-xs text-gray-500">{res.profiles?.phone_number}</div>
               </td>
 
-              {/* Columna Fechas */}
-              <td className="px-6 py-4">
-                <div>Del: {new Date(res.start_date).toLocaleDateString()}</div>
-                <div>Al: {new Date(res.end_date).toLocaleDateString()}</div>
+              <td className="px-6 py-4 text-xs">
+                <div className="text-gray-400">Del: {new Date(res.start_date).toLocaleDateString()}</div>
+                <div className="text-gray-400">Al: {new Date(res.end_date).toLocaleDateString()}</div>
               </td>
 
-              {/* Columna Precio */}
-              <td className="px-6 py-4 text-green-400 font-bold">
-                ${res.total_price}
-              </td>
-
-              {/* Columna Estado (Lógica simple de fechas) */}
               <td className="px-6 py-4">
                 {new Date(res.end_date) < new Date() ? (
-                  <span className="px-2 py-1 bg-gray-600 rounded text-xs">Finalizada</span>
+                  <span className="px-2 py-1 bg-gray-600 text-white rounded text-xs">Finalizada</span>
                 ) : (
-                  <span className="px-2 py-1 bg-blue-600 rounded text-xs text-white">Activa</span>
+                  <span className="px-2 py-1 bg-green-600 text-white rounded text-xs animate-pulse">Activa</span>
                 )}
+              </td>
+
+              <td className="px-6 py-4 text-center">
+                <button 
+                  onClick={() => handleDelete(res.id, res.tool_id)}
+                  className="p-2 text-red-400 hover:bg-red-900/50 rounded-full transition-colors"
+                  title="Cancelar Reserva y Devolver Stock"
+                >
+                  <TrashIcon className="h-5 w-5" />
+                </button>
               </td>
             </tr>
           ))}
