@@ -40,9 +40,11 @@ export default async function AlquilerPage() {
   }
   
   // 3. La consulta de herramientas es pública
+  // --- 1. CONSULTA MEJORADA ---
   const { data, error } = await supabase
     .from('tools')
-    .select('*');
+    .select('*')
+    .order('name', { ascending: true }); // ⬅️ ORDENAR ALFABÉTICAMENTE
 
   const tools = data as Tool[] | null;
 
@@ -74,20 +76,26 @@ export default async function AlquilerPage() {
     );
   }
 
-  // 5. Renderizado Normal
-  return (
-    <main className="flex min-h-screen flex-col items-center p-12 md:p-24 pt-28 bg-white">
-      <div className="w-full max-w-6xl">
-        
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-          Hola, <span className="text-blue-700">{greetingName}</span>
-        </h1>
-        <p className="text-xl text-gray-700 mb-12">
-          {user ? "Bienvenido a nuestro catálogo de alquiler." : "Explora nuestro catálogo. Inicia sesión para alquilar."}
-        </p>
+  // --- 2. EXTRAER CATEGORÍAS ÚNICAS ---
+  // Esto crea una lista automática: ["Todas", "Eléctrica", "Manual", ...]
+  // Basada en lo que realmente hay en la base de datos.
+  const categories = ["Todas", ...Array.from(new Set(tools.map(tool => tool.category)))];
 
-        {/* 6. Pasamos el 'user' (o 'null') al componente de cliente */}
-        <ToolGrid tools={tools} user={user} />
+  return (
+    <main className="flex min-h-screen flex-col items-center p-8 md:p-12 pt-28 bg-gray-50">
+      <div className="w-full max-w-7xl">
+        
+        <div className="text-center mb-12">
+          <h1 className="text-7xl md:text-5xl font-bold text-gray-900 mb-4 pt-20">
+            Hola, <span className="text-blue-700">{greetingName}</span>
+          </h1>
+          <p className="text-xl text-gray-600">
+            {user ? "Encuentra la herramienta perfecta para tu proyecto." : "Explora nuestro catálogo profesional."}
+          </p>
+        </div>
+
+        {/* 3. PASAMOS LAS HERRAMIENTAS Y LAS CATEGORÍAS AL CLIENTE */}
+        <ToolGrid tools={tools} user={user} categories={categories} />
 
       </div>
     </main>

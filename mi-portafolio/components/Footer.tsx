@@ -18,7 +18,7 @@ export default function Footer() {
             Desde la idea hasta la ejecución, nuestro equipo de expertos y nuestro inventario están a tu servicio.
           </p>
           <a 
-            href="https://wa.me/573001234567" // ⬅️ ¡CAMBIA ESTE NÚMERO!
+            href="https://wa.me/573132441090" // ⬅️ ¡CAMBIA ESTE NÚMERO!
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block px-10 py-4 bg-blue-500 text-white text-xl font-bold rounded-lg 
@@ -99,12 +99,12 @@ export default function Footer() {
               </li>
               <li>
                 <a 
-                  href="https://wa.me/573001234567" // ⬅️ ¡CAMBIA ESTE NÚMERO!
+                  href="https://wa.me/573132441090" // ⬅️ ¡CAMBIA ESTE NÚMERO!
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-400 hover:text-white transition-colors"
                 >
-                  +57 300 123 4567 (WhatsApp)
+                  +57 3132441090 (WhatsApp)
                 </a>
               </li>
               <li>

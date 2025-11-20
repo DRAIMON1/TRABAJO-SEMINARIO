@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar"; // <-- 1. IMPORTA EL NAVBAR
 import Footer from "@/components/Footer";
 const inter = Inter({ subsets: ["latin"] });
+import { Toaster } from 'react-hot-toast'
 
 export const metadata: Metadata = {
   // Cambiamos el título para que coincida
@@ -19,6 +20,8 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={inter.className}>
+        {/* 2. COLOCAR EL TOASTER AQUÍ (Arriba del Navbar) */}
+        <Toaster position="bottom-center" toastOptions={{ duration: 4000 }} />
         <Navbar /> {/* <-- 2. AÑADE EL NAVBAR AQUÍ */}
         {children}
         <Footer /> {/* <-- 3. AÑADE EL FOOTER AQUÍ */}
