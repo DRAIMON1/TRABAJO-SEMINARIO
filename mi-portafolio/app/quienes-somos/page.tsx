@@ -49,7 +49,7 @@ export default function QuienesSomosPage() {
       {/* --- 1. BANNER MEJORADO (RESPONSIVO) --- */}
       <div className="relative w-full min-h-[60vh] flex items-center justify-center text-center px-4 py-20">
         <Image
-          src="/equipo/banner-equipo.jpg" 
+          src="/equipo/banner-equipo.jpeg" 
           alt="Equipo de Construtech ISL"
           fill
           style={{ objectFit: 'cover' }}
